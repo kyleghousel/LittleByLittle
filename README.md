@@ -19,8 +19,8 @@
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/little-by-little.git
-cd little-by-little
+git clone git@github.com:kyleghousel/LittleByLittle.git
+cd LittleByLittle
 ```
 
 ### 2. Install dependencies
