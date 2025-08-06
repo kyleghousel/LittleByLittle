@@ -193,24 +193,33 @@ class CLIInterface
   def handle_quit(choice)
     return unless %w[q quit exit].include?(choice)
 
-    puts "Goodbye!"
+    puts "Say bye-bye!"
     exit
 
   end
 
+  def handle_back(choice)
+    if %w[b back <<].include?(choice)
+      puts "\n<<\n"
+      return :back
+    end
+
+    nil
+  end
+
   def display_main_menu
-    puts "\n=== Main Menu ==="
-    puts "1. View data"
-    puts "2. Create new record"
-    puts "3. Update record"
-    puts "4. Delete record"
-    puts "q. Quit"
+    puts "\n\e[1m=== Main Menu ===\e[0m"
+    puts "\e[1;34m1. View data"
+    puts "\e[1;32m2. Create new record\e[0m"
+    puts "\e[1;33m3. Update record\e[0m"
+    puts "\e[1;31m4. Delete record\e[0m"
+    puts "\e[1mq. Quit\e[0m"
     print "\nEnter your choice: "
   end
 
   def view_menu
     loop do
-      puts "\n--- View Menu ---"
+      puts "\n\e[1;34m--- View Menu ---\e[0m"
       puts "1. View all children"
       puts "2. View all entries"
       puts "3. View all milestones"
@@ -222,6 +231,7 @@ class CLIInterface
 
       choice = gets.chomp.downcase
       handle_quit(choice)
+      break if handle_back(choice) == :back
 
       case choice
       when "1" then view_all_children
@@ -230,7 +240,6 @@ class CLIInterface
       when "4" then view_entries_by_child
       when "5" then view_entries_by_milestone
       when "6" then view_milestones_by_child
-      when "b" then break
       else puts "Invalid choice. Try again."
       end
     end
@@ -238,7 +247,7 @@ class CLIInterface
 
   def create_menu
     loop do
-      puts "\n--- Create Menu ---"
+      puts "\n\e[4;32m--- Create Menu ---\e[0m"
       puts "1. Create a new child"
       puts "2. Create a new entry"
       puts "3. Create a new milestone"
@@ -247,12 +256,12 @@ class CLIInterface
 
       choice = gets.chomp.downcase
       handle_quit(choice)
+      break if handle_back(choice) == :back
 
       case choice
       when "1" then create_child
       when "2" then create_entry
       when "3" then create_milestone
-      when "b" then break
       else puts "Invalid choice. Try again."
       end
     end
@@ -260,7 +269,7 @@ class CLIInterface
 
   def update_menu
     loop do
-      puts "\n--- Update Menu ---"
+      puts "\n\e[4;33m--- Update Menu ---\e[0m"
       puts "1. Update a child"
       puts "2. Update an entry"
       puts "3. Update a milestone"
@@ -269,12 +278,12 @@ class CLIInterface
 
       choice = gets.chomp.downcase
       handle_quit(choice)
+      break if handle_back(choice) == :back
 
       case choice
       when "1" then update_child
       when "2" then update_entry
       when "3" then update_milestone
-      when "b" then break
       else puts "Invalid choice. Try again."
       end
     end
@@ -282,7 +291,7 @@ class CLIInterface
 
   def delete_menu
     loop do
-      puts "\n--- Delete Menu ---"
+      puts "\n\e[4;31m--- Delete Menu ---\e[0m"
       puts "1. Delete a child (legally)"
       puts "2. Delete an entry"
       puts "3. Delete a milestone"
@@ -291,12 +300,12 @@ class CLIInterface
 
       choice = gets.chomp.downcase
       handle_quit(choice)
+      handle_back(choice)
 
       case choice
       when "1" then delete_child
       when "2" then delete_entry
       when "3" then delete_milestone
-      when "b" then break
       else puts "Invalid choice. Try again."
       end
     end
