@@ -13,6 +13,17 @@ class ChildrenController < ApplicationController
     end
   end
 
+  get "/children/:id/milestones" do
+    child = Child.find_by(id: params[:id])
+    if child.nil?
+      status 404
+      return { error: "Child not found" }.to_json
+    end
+
+    milestones = child.entries.includes(:milestone).map(&:milestone).uniq
+    milestones.to_json
+  end
+
   post "/children" do
     begin
       parsed_birthdate = Date.parse(params[:birthdate])
