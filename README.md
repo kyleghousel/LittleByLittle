@@ -2,6 +2,8 @@
 
 `LittleByLittle` is a Ruby CLI CRUD application for logging and tracking a child's developmental milestones. Users can create child profiles, add milestone entries, view and update records, and visualize progress — utilizing a Sinatra JSON API backend.
 
+![Demo of LittleByLittle](demo.gif)
+
 ---
 
 ## Features
