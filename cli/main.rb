@@ -112,6 +112,13 @@ class APIClient
     { error: "Failed to fetch milestones: #{e.message}" }
   end
 
+  def get_milestone(id)
+    response = RestClient.get("#{@base_url}/milestones/#{id}")
+    parse_response(response)
+  rescue RestClient::Exception => e
+    { error: "Failed to fetch entry: #{e.message}" }
+  end
+
   def create_milestone(data)
     response = RestClient.post("#{@base_url}/milestones", data.to_json, content_type: :json)
     parse_response(response)
@@ -139,11 +146,17 @@ class CLIInterface
     @api_client = APIClient.new
   end
 
+  def rainbow_block(text)
+    colors = [31, 33, 32, 36, 34, 35]
+    lines = text.lines.map.with_index do |line, i|
+      "\e[1;#{colors[i % colors.length]}m#{line.chomp}\e[0m"
+    end
+    puts lines.join("\n")
+  end
+
   def run
-    puts "Welcome to LittleByLittle CLI!"
-    puts "Make sure your API server is running on http://localhost:9292"
-    puts
-    puts <<~'ASCII'
+
+    ascii_art = <<~'ASCII'
 
 
        _      _  _    _    _       ______         _      _  _    _    _
@@ -155,6 +168,11 @@ class CLIInterface
                                             __/ |
                                            |___/
     ASCII
+
+    puts "\nWelcome to \e[1;35mLittleByLittle CLI\e[0m 🍼"
+    puts "Make sure your API server is running on http://localhost:9292"
+    puts
+    puts rainbow_block(ascii_art)
     puts "Log your child's developmental milestones!"
 
     loop do
@@ -300,7 +318,7 @@ class CLIInterface
         end
       end
     else
-      puts "Error: #{response[:error]}"
+      puts "❌ Error: #{response[:error]}"
     end
   end
 
@@ -318,7 +336,7 @@ class CLIInterface
         end
       end
     else
-      puts "Error: #{response[:error]}"
+      puts "❌ Error: #{response[:error]}"
     end
   end
 
@@ -336,7 +354,7 @@ class CLIInterface
         end
       end
     else
-      puts "Error: #{response[:error]}"
+      puts "❌ Error: #{response[:error]}"
     end
   end
 
@@ -357,7 +375,7 @@ class CLIInterface
         end
       end
     else
-      puts "Error: #{response[:error]}"
+      puts "❌ Error: #{response[:error]}"
     end
   end
 
@@ -378,7 +396,7 @@ class CLIInterface
         end
       end
     else
-      puts "Error: #{response[:error]}"
+      puts "❌ Error: #{response[:error]}"
     end
   end
 
@@ -399,8 +417,20 @@ class CLIInterface
         end
       end
     else
-      puts "Error: #{response[:error]}"
+      puts "❌ Error: #{response[:error]}"
     end
+  end
+
+  def with_spinner(message = "Loading", duration: 1.0, interval: 0.1)
+    spinner = %w[| / - \\]
+    total_frames = (duration / interval).to_i
+
+    total_frames.times do |i|
+      print "\r#{message} #{spinner[i % spinner.length]}"
+      sleep(interval)
+    end
+
+    print "\r#{message}\n"
   end
 
   def create_child
@@ -416,10 +446,12 @@ class CLIInterface
 
     response = @api_client.create_child(data)
 
+    with_spinner("Creating child...")
+
     if response[:error]
-      puts "Error: #{response[:error]}"
+      puts "❌ Error: #{response[:error]}"
     else
-      puts "Child created successfully!"
+      puts "\n👶 Child created successfully!"
       display_child(response)
     end
   end
@@ -467,10 +499,12 @@ class CLIInterface
 
     response = @api_client.create_entry(data)
 
+    with_spinner("Creating entry...")
+
     if response[:error]
-      puts "Error: #{response[:error]}"
+      puts "\n❌ Error: #{response[:error]}"
     else
-      puts "Entry created successfully!"
+      puts "\n📝 Entry created successfully!"
       display_entry(response)
     end
   end
@@ -484,14 +518,21 @@ class CLIInterface
     print "Milestone Type: "
     milestone_type = gets.chomp
 
+    if title.strip.empty? || milestone_type.strip.empty?
+      puts "\n❌ Error: Title and Type cannot be blank."
+      return
+    end
+
     data = { title: title, milestone_type: milestone_type }
 
     response = @api_client.create_milestone(data)
 
+    with_spinner("Creating milestone...")
+
     if response[:error]
-      puts "Error: #{response[:error]}"
+      puts "\n❌ Error: #{response[:error]}"
     else
-      puts "Milestone created successfully!"
+      puts "\n📈 Milestone created successfully!"
       display_milestone(response)
     end
   end
@@ -503,7 +544,7 @@ class CLIInterface
 
     current_child = @api_client.get_child(id)
     if current_child[:error]
-      puts "Error: #{current_child[:error]}"
+      puts "\n❌ Error: #{current_child[:error]}"
       return
     end
 
@@ -518,16 +559,18 @@ class CLIInterface
 
     print "Birthdate (YYYY-MM-DD) (#{current_child['birthdate']}): "
     birthdate = gets.chomp
-    birthdate = current_child["birthdate"] if birhdate.empty?
+    birthdate = current_child["birthdate"] if birthdate.empty?
 
     data = { name: name, birthdate: birthdate }
 
-    response = @api_client.update_owner(id, data)
+    response = @api_client.update_child(id, data)
+
+    with_spinner("Updating child...")
 
     if response[:error]
-      puts "Error: #{response[:error]}"
+      puts "\n❌ Error: #{response[:error]}"
     else
-      puts "Child updated successfully!"
+      puts "\n👶 Child updated successfully!"
       display_child(response)
     end
   end
@@ -540,7 +583,7 @@ class CLIInterface
 
     current_entry = @api_client.get_entry(id)
     if current_entry[:error]
-      puts "Error: #{current_entry[:error]}"
+      puts "\n❌ Error: #{current_entry[:error]}"
       return
     end
 
@@ -574,10 +617,12 @@ class CLIInterface
 
     response = @api_client.update_entry(id, data)
 
+    with_spinner("Updating entry...")
+
     if response[:error]
-      puts "Error: #{response[:error]}"
+      puts "\n❌ Error: #{response[:error]}"
     else
-      puts "Entry updated successfully!"
+      puts "\n📝 Entry updated successfully!"
       display_entry(response)
     end
   end
@@ -589,7 +634,7 @@ class CLIInterface
 
     current_milestone = @api_client.get_milestone(id)
     if current_milestone[:error]
-      puts "Error: #{current_milestone[:error]}"
+      puts "\n❌ Error: #{current_milestone[:error]}"
       return
     end
 
@@ -610,10 +655,12 @@ class CLIInterface
 
     response = @api_client.update_milestone(id, data)
 
+    with_spinner("Updating milestone...")
+
     if response[:error]
-      puts "Error: #{response[:error]}"
+      puts "\n❌ Error: #{response[:error]}"
     else
-      puts "Milestone updated successfully!"
+      puts "\n📈 Milestone updated successfully!"
       display_milestone(response)
     end
 
@@ -630,10 +677,12 @@ class CLIInterface
     if %w[y yes].include?(confirmation)
       response = @api_client.delete_child(id)
 
+      with_spinner("Deleting...")
+
       if response[:error]
-        puts "Error: #{response[:error]}"
+        puts "\n❌ Error: #{response[:error]}"
       else
-        puts "Child deleted successfully!"
+        puts "\n👶 Child deleted successfully!"
       end
     else
       puts "Deletion cancelled."
@@ -651,10 +700,12 @@ class CLIInterface
     if %w[y yes].include?(confirmation)
       response = @api_client.delete_entry(id)
 
+      with_spinner("Deleting...")
+
       if response[:error]
-        puts "Error: #{response[:error]}"
+        puts "\n❌ Error: #{response[:error]}"
       else
-        puts "Entry deleted successfully!"
+        puts "\n📝 Entry deleted successfully!"
       end
     else
       puts "Deletion cancelled."
@@ -672,10 +723,12 @@ class CLIInterface
     if %w[y yes].include?(confirmation)
       response = @api_client.delete_milestone(id)
 
+      with_spinner("Deleting...")
+
       if response[:error]
-        puts "Error: #{response[:error]}"
+        puts "\n❌ Error: #{response[:error]}"
       else
-        puts "Milestone deleted successfully!"
+        puts "\n📈 Milestone deleted successfully!"
       end
     else
       puts "Deletion cancelled."
@@ -683,7 +736,7 @@ class CLIInterface
   end
 
   def display_child(child)
-    puts "ID: #{child['id']}"
+    puts "\nChild ID: #{child['id']}"
     puts "Name: #{child['name']}"
     puts "Birthdate: #{child['birthdate']}"
 
@@ -696,7 +749,7 @@ class CLIInterface
   end
 
   def display_entry(entry)
-    puts "ID: #{entry['id']}"
+    puts "\nEntry ID: #{entry['id']}"
     puts "Date: #{entry['date']}"
     puts "Note: #{entry['note']}"
     puts "Age: #{entry['age_months']}"
@@ -708,7 +761,7 @@ class CLIInterface
   end
 
   def display_milestone(milestone)
-    puts "ID: #{milestone['id']}"
+    puts "\nMilestone ID: #{milestone['id']}"
     puts "Title: #{milestone['title']}"
     puts "Type: #{milestone['milestone_type']}"
 
