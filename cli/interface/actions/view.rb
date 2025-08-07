@@ -110,7 +110,7 @@ module ViewActions
   end
 
   def view_milestones_by_child
-    return unless view_all_children == true
+    return unless view_all_children
 
     puts "\n Enter a Child ID to see the milestones achieved by that Child."
     print "ID: "
