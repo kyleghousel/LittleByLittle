@@ -62,21 +62,21 @@ class APIClient
     response = RestClient.get("#{@base_url}/children/#{id}/entries")
     parse_response(response)
   rescue RestClient::Exception => e
-    { error: "Failed to fetch entry: #{e.message}" }
+    { error: "Failed to fetch entries: #{e.message}" }
   end
 
   def get_entries_by_milestone(id)
     response = RestClient.get("#{@base_url}/milestones/#{id}/entries")
     parse_response(response)
   rescue RestClient::Exception => e
-    { error: "Failed to fetch entry: #{e.message}" }
+    { error: "Failed to fetch entries: #{e.message}" }
   end
 
   def get_milestones_by_child(id)
     response = RestClient.get("#{@base_url}/children/#{id}/milestones")
     parse_response(response)
   rescue RestClient::Exception => e
-    { error: "Failed to fetch child: #{e.message}" }
+    { error: "Failed to fetch milestones: #{e.message}" }
   end
 
   def create_entry(data)
@@ -111,7 +111,7 @@ class APIClient
     response = RestClient.get("#{@base_url}/milestones/#{id}")
     parse_response(response)
   rescue RestClient::Exception => e
-    { error: "Failed to fetch entry: #{e.message}" }
+    { error: "Failed to fetch milestone: #{e.message}" }
   end
 
   def create_milestone(data)
