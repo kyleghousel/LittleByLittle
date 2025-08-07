@@ -32,8 +32,13 @@ Make sure you have Ruby installed (3.x recommended). Then run:
 ```bash
 bundle install
 ```
+### 3. Set up the database with test data
 
-### 3. Start the Sinatra backend
+```bash
+bundle exec rake db:create db:migrate db:seed
+```
+
+### 4. Start the Sinatra backend
 
 From the project root (or the API folder if separated), run:
 
@@ -43,7 +48,7 @@ bundle exec rackup
 
 The server should start at `http://localhost:9292`.
 
-### 4. Run the CLI app
+### 5. Run the CLI app
 
 In a separate terminal tab:
 
