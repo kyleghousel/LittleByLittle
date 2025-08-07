@@ -39,4 +39,9 @@ class BaseInterface
 
     nil
   end
+
+  def play_sound_async(path)
+    pid = spawn("afplay", path)
+    Process.detach(pid)
+  end
 end

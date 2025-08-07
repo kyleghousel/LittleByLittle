@@ -44,8 +44,9 @@ class CLIInterface < Menus
     puts "Make sure your API server is running on http://localhost:9292"
     puts
     puts rainbow_block(ascii_art)
-    puts "Log your child's developmental milestones!"
 
+    puts "Log your child's developmental milestones!"
+    play_sound_async("assets/app_music.mov")
     loop do
       display_main_menu
       choice = gets.chomp.downcase
