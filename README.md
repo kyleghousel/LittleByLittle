@@ -53,7 +53,7 @@ The server should start at `http://localhost:9292`.
 In a separate terminal tab:
 
 ```bash
-ruby cli.rb
+ruby cli/main.rb
 ```
 
 You’ll now be in the LittleByLittle terminal interface!
